@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.6.RELEASE</version>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<groupId>com.fengxin58</groupId>
+	<artifactId>limiter</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Spring-Boot Limiter Parent</name>
+
+	<modules>
+		<module>spring-cloud-starter-limiter</module>
+		<module>spring-boot-limiter-core</module>
+		<module>spring-boot-limiter-redis</module>
+		<module>spring-boot-limiter-oauth2</module>
+		<module>spring-boot-limiter-web</module>
+		<module>spring-boot-limiter-sample</module>
+		<module>spring-boot-limiter-autoconfigure</module>
+	</modules>
+
+</project>
