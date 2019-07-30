@@ -12,7 +12,11 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.fengxin58.limiter.event.RateCheckFailureEvent;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public final class RateChecker implements ApplicationContextAware {
+	
 	private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 	private final IRateLimiterFactory rateLimiterFactory;
@@ -38,6 +42,7 @@ public final class RateChecker implements ApplicationContextAware {
 			//TODO checkActionTimeout
 			retVal = checkResult.get(100, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			applicationContext.publishEvent(new RateCheckFailureEvent(e, "Access rate check task executed failed."));
 		} 
 		return retVal;
