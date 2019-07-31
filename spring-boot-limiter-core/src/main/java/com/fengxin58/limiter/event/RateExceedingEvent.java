@@ -1,11 +1,19 @@
 package com.fengxin58.limiter.event;
 
-import lombok.Data;
 import org.springframework.context.ApplicationEvent;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 @Data
+@EqualsAndHashCode(callSuper=false)
 public final class RateExceedingEvent extends ApplicationEvent {
-    private static Object dummy = new Object();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private static Object dummy = new Object();
     private String applicationName;
     private String controllerName;
     private String methodName;

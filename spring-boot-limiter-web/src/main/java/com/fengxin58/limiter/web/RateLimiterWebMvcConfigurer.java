@@ -6,9 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 public final class RateLimiterWebMvcConfigurer implements WebMvcConfigurer {
 
-    private final RateCheckInterceptor rateCheckInterceptor;
+    private final RateLimiterCheckInterceptor rateCheckInterceptor;
     
-    public RateLimiterWebMvcConfigurer(RateCheckInterceptor rateCheckInterceptor) {
+    public RateLimiterWebMvcConfigurer(RateLimiterCheckInterceptor rateCheckInterceptor) {
     	this.rateCheckInterceptor = rateCheckInterceptor;
     }
 

@@ -1,6 +1,7 @@
 package com.fengxin58.limiter.web.configuration;
 
 
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,8 +17,9 @@ import com.fengxin58.limiter.web.AuthenticationPopulator;
 @Configuration
 @EnableConfigurationProperties(LimiterProperties.class)
 @ConditionalOnWebApplication
-@ConditionalOnClass({Authentication.class,OAuth2Authentication.class})
-public class LimiterOAuth2SupportAutoConfiguration {
+@ConditionalOnClass({Authentication.class,OAuth2Authentication.class,AuthenticationPopulator.class})
+@AutoConfigureBefore(LimiterWebSupportAutoConfiguration.class)
+public class OAuth2SupportAutoConfiguration {
 
     @Bean
     public AuthenticationPopulator authenticationPopulator() {

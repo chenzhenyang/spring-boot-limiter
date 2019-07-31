@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fengxin58.limiter.IRateLimiterFactory;
-import com.fengxin58.limiter.RateChecker;
+import com.fengxin58.limiter.RateLimiterChecker;
 import com.fengxin58.limiter.event.DefaultRateCheckFailureListener;
 import com.fengxin58.limiter.event.DefaultRateExceedingListener;
 import com.fengxin58.limiter.event.RateCheckFailureListener;
@@ -17,15 +17,14 @@ import com.fengxin58.limiter.event.RateExceedingListener;
 @EnableConfigurationProperties(LimiterProperties.class)
 public class LimiterAutoConfiguration {
 
-
     @Autowired
     private LimiterProperties limiterProperties;
     
     @Bean
-    @ConditionalOnMissingBean(RateChecker.class)
-    public RateChecker rateCheckTaskRunner(IRateLimiterFactory rateLimiterFactory) {
-    	RateChecker rateCheckTaskRunner = new RateChecker(rateLimiterFactory);
-        return rateCheckTaskRunner;
+    @ConditionalOnMissingBean(RateLimiterChecker.class)
+    public RateLimiterChecker rateLimiterChecker(IRateLimiterFactory rateLimiterFactory) {
+    	RateLimiterChecker rateChecker = new RateLimiterChecker(rateLimiterFactory,limiterProperties.getCheckActionTimeout());
+        return rateChecker;
     }
 
     @Bean

@@ -27,7 +27,7 @@ public class RedisUtils {
     	return redisServerTimeSecondUnit;
     }
 
-	public Long getServerTimeInMicros() throws InterruptedException, ExecutionException {
+	public Long getServerTimeInMicros() throws InterruptedException, ExecutionException{
 		LettuceConnection redisConnection = (LettuceConnection) redisTemplate.getRequiredConnectionFactory()
 				.getConnection();
 		RedisClusterAsyncCommands<byte[], byte[]> connection = redisConnection.getNativeConnection();

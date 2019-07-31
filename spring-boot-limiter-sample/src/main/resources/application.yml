@@ -1,4 +1,5 @@
 debug: false
+logging:  level:    com.fengxin58: debug
 server:
   port: 8888
 spring:
@@ -6,6 +7,7 @@ spring:
     name: demo1
   redis: 
     host: 127.0.0.1
+  limiter:    enable-dynamical-conf: true
 security: 
   oauth2:
     resource:

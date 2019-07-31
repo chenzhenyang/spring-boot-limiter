@@ -2,7 +2,6 @@ package com.fengxin58.limiter.web;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,24 +21,34 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.fengxin58.limiter.DynamicRateLimiter;
 import com.fengxin58.limiter.LimiterConfig;
-import com.fengxin58.limiter.RateChecker;
 import com.fengxin58.limiter.RateLimiter;
+import com.fengxin58.limiter.RateLimiterChecker;
 import com.fengxin58.limiter.event.RateExceedingEvent;
 
-public final class RateCheckInterceptor extends HandlerInterceptorAdapter implements ApplicationContextAware, InitializingBean {
+public final class RateLimiterCheckInterceptor extends HandlerInterceptorAdapter implements ApplicationContextAware, InitializingBean {
 
 	private String keyPrefix;
 
-    private  RateChecker rateCheckTaskRunner;
+    private  RateLimiterChecker rateCheckTaskRunner;
 
     private  RedisLimiterConfigProcessor redisLimiterConfigProcessor;
 
     private ApplicationContext applicationContext;
 
     private String applicationName;
-
     
-    public RateCheckInterceptor(RateChecker rateCheckTaskRunner,RedisLimiterConfigProcessor redisLimiterConfigProcessor) {
+    private Collection<IStandardEvaluationContextPopulator> populators;
+    
+    
+    public Collection<IStandardEvaluationContextPopulator> getPopulators() {
+		return populators;
+	}
+
+	public void setPopulators(Collection<IStandardEvaluationContextPopulator> populators) {
+		this.populators = populators;
+	}
+
+	public RateLimiterCheckInterceptor(RateLimiterChecker rateCheckTaskRunner,RedisLimiterConfigProcessor redisLimiterConfigProcessor) {
     	this.redisLimiterConfigProcessor = redisLimiterConfigProcessor;
     	this.rateCheckTaskRunner = rateCheckTaskRunner;
     	this.redisLimiterConfigProcessor = redisLimiterConfigProcessor;
@@ -90,8 +99,8 @@ public final class RateCheckInterceptor extends HandlerInterceptorAdapter implem
             baseVal = eval(baseExp, request);
         }
         String rateLimiterKey = keyPrefix + ":" + applicationName + ":" + path + ":" + baseVal;
-        boolean isSuccess = rateCheckTaskRunner.checkRun(rateLimiterKey, timeUnit, permits);
-
+        boolean isSuccess = rateCheckTaskRunner.check(rateLimiterKey, timeUnit, permits);
+        
         if(!isSuccess) {
             rateExceeded(method, response, baseExp, baseVal, path, permits, timeUnit.name());
         }
@@ -115,7 +124,7 @@ public final class RateCheckInterceptor extends HandlerInterceptorAdapter implem
             int permits = limiterConfig.getPermits();
             String timeUnit = limiterConfig.getTimeUnit();
             String rateLimiterKey = keyPrefix + ":" + applicationName + ":" + path + ":" + baseVal;
-            isSuccess = rateCheckTaskRunner.checkRun(rateLimiterKey, TimeUnit.valueOf(timeUnit), permits);
+            isSuccess = rateCheckTaskRunner.check(rateLimiterKey, TimeUnit.valueOf(timeUnit), permits);
             if(!isSuccess) {
                 rateExceeded(method, response, baseExp, baseVal, path, permits, timeUnit);
             }
@@ -141,9 +150,8 @@ public final class RateCheckInterceptor extends HandlerInterceptorAdapter implem
         StandardEvaluationContext context = new StandardEvaluationContext();
         ExpressionParser expressionParser = new SpelExpressionParser();
         
-        Map<String, IStandardEvaluationContextPopulator> beansOfType = applicationContext.getBeansOfType(IStandardEvaluationContextPopulator.class);
+        Collection<IStandardEvaluationContextPopulator> populators = getPopulators();
         
-        Collection<IStandardEvaluationContextPopulator> populators = beansOfType.values();
         populators.forEach(populator->{
         	populator.populate(request, context);
         });
@@ -158,7 +166,7 @@ public final class RateCheckInterceptor extends HandlerInterceptorAdapter implem
 
     private void buildDenyResponse(HttpServletResponse response) throws Exception{
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        response.getWriter().print("Access denied because of exceeding access rate");
+        response.getWriter().print("Access denied because of exceeding access rate limiter,please try again later");
     }
 
 }

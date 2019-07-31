@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class CookiesPopulator implements IStandardEvaluationContextPopulator{
 
 	@Override
@@ -19,6 +22,10 @@ public class CookiesPopulator implements IStandardEvaluationContextPopulator{
             }
         }
         context.setVariable("Cookies", cookieMap);
+        
+        if(log.isDebugEnabled()) {
+        	log.debug("Popluate StandardEvaluationContext with Cookies\n" + MapUtils.toString(cookieMap));
+        }
 	}
 
 }

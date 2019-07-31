@@ -1,5 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.fengxin58.limiter.configuration.LimiterAutoConfiguration,\
 com.fengxin58.limiter.redis.configuration.RedisLimiterAutoConfiguration,\
-com.fengxin58.limiter.web.configuration.LimiterWebSupportAutoConfiguration,\
-com.fengxin58.limiter.web.configuration.LimiterOAuth2SupportAutoConfiguration
+com.fengxin58.limiter.web.configuration.WebPopulatorAutoConfiguration,\
+com.fengxin58.limiter.web.configuration.OAuth2SupportAutoConfiguration,\
+com.fengxin58.limiter.web.configuration.LimiterWebSupportAutoConfiguration

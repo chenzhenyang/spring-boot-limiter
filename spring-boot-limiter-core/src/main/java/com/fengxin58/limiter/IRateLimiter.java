@@ -1,7 +1,19 @@
 package com.fengxin58.limiter;
 
+/**
+ * 
+ * @author chenzhenyang
+ *
+ */
 public interface IRateLimiter {
 	
-	boolean acquire(String keyPrefix, int permitsPerUnit) throws AcquireException;
+	/**
+	 * 
+	 * @param key
+	 * @param permitsPerUnit
+	 * @return
+	 * @throws AcquireException
+	 */
+	boolean acquire(String key, int permitsPerUnit);
 	
 }

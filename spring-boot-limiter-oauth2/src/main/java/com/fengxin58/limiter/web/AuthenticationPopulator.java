@@ -10,6 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class AuthenticationPopulator implements IStandardEvaluationContextPopulator{
 
 	@Override
@@ -26,6 +29,10 @@ public class AuthenticationPopulator implements IStandardEvaluationContextPopula
 			map.put("user_name", principal.toString());
 			map.put("client_id", clientId);
 			context.setVariable("JwtClaims", map);
+			
+			if(log.isDebugEnabled()) {
+	        	log.debug("Popluate StandardEvaluationContext with OAuth2Authentication\n" + MapUtils.toString(map));
+	        }
 		}
 		
 		//TODO other type Authentication

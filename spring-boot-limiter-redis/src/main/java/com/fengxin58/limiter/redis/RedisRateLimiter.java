@@ -12,15 +12,17 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.fengxin58.limiter.AcquireException;
 import com.fengxin58.limiter.IRateLimiter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Redis based Rate limiter
  *
  * @author chenzhenyang czy_1@qq.com>
  */
-public final class RedisRateLimiter implements IRateLimiter{
+@Slf4j
+public final class RedisRateLimiter implements IRateLimiter {
 
 	@SuppressWarnings("rawtypes")
 	private final RedisTemplate redisTemplate;
@@ -39,7 +41,7 @@ public final class RedisRateLimiter implements IRateLimiter{
 		this.timeUnit = timeUnit;
 		this.timeUnitCalculator = new TimeUnitCalculator(timeUnit);
 		redisTemplate = new StringRedisTemplate(redisConnectionFactory);
-		
+
 		redisUtils = new RedisUtils(redisTemplate);
 
 		LUA_SECOND_SCRIPT.setLocation(new ClassPathResource("lua/second.lua"));
@@ -49,24 +51,28 @@ public final class RedisRateLimiter implements IRateLimiter{
 		LUA_PERIOD_SCRIPT.setResultType(Long.class);
 	}
 
-	public boolean acquire(String keyPrefix, int permitsPerUnit) {
+	public boolean acquire(String key, int permitsPerUnit) {
 		boolean rtv = false;
 		if (timeUnit == TimeUnit.SECONDS) {
-			String keyName = getKeyNameForSecond(keyPrefix);
-			List<Object> keys = new ArrayList<>(1);
-			keys.add(keyName);
-			@SuppressWarnings("unchecked")
-			Object val = redisTemplate.execute(LUA_SECOND_SCRIPT, new StringRedisSerializer(),
-					new StringRedisSerializer(), keys, String.valueOf(timeUnitCalculator.getExpire()),
-					String.valueOf(permitsPerUnit));
-			rtv = (Long.parseLong(val.toString()) > 0);
+			rtv = doSecond(key, permitsPerUnit);
 		} else if (timeUnit == TimeUnit.MINUTES || timeUnit == TimeUnit.HOURS || timeUnit == TimeUnit.DAYS) {
 			try {
-				rtv = doPeriod(keyPrefix, permitsPerUnit);
+				rtv = doPeriod(key, permitsPerUnit);
 			} catch (InterruptedException | ExecutionException e) {
-				throw new AcquireException(e);
+				log.error(e.getMessage(), e);
 			}
 		}
+		return rtv;
+	}
+
+	private boolean doSecond(String key, int permitsPerUnit) {
+		String keyName = getKeyNameForSecond(key);
+		List<Object> keys = new ArrayList<>(1);
+		keys.add(keyName);
+		@SuppressWarnings("unchecked")
+		Object val = redisTemplate.execute(LUA_SECOND_SCRIPT, new StringRedisSerializer(), new StringRedisSerializer(),
+				keys, String.valueOf(timeUnitCalculator.getExpire()), String.valueOf(permitsPerUnit));
+		boolean rtv = (Long.parseLong(val.toString()) > 0);
 		return rtv;
 	}
 
@@ -87,9 +93,9 @@ public final class RedisRateLimiter implements IRateLimiter{
 					previousSectionBeginScore, expires, String.valueOf(permitsPerUnit));
 			return (Long.parseLong(val.toString()) > 0);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
+			return false;
 		}
-		return false;
 	}
 
 	private String getKeyNameForSecond(String keyPrefix) {

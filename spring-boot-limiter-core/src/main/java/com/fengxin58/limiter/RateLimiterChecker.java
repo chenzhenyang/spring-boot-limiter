@@ -1,7 +1,6 @@
 package com.fengxin58.limiter;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -15,40 +14,44 @@ import com.fengxin58.limiter.event.RateCheckFailureEvent;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class RateChecker implements ApplicationContextAware {
-	
+public final class RateLimiterChecker implements ApplicationContextAware {
+
 	private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 	private final IRateLimiterFactory rateLimiterFactory;
 
+	private ApplicationContext applicationContext;
 
-	public RateChecker(IRateLimiterFactory redisRateLimiterFactory) {
-		this.rateLimiterFactory = redisRateLimiterFactory;
+	/**
+	 * check action execution timeout(MILLISECONDS)
+	 */
+	private long checkActionTimeout = 10000;
+
+	public RateLimiterChecker(IRateLimiterFactory rateLimiterFactory, long checkActionTimeout) {
+		this.rateLimiterFactory = rateLimiterFactory;
+		this.checkActionTimeout = checkActionTimeout;
 
 	}
-
-	private ApplicationContext applicationContext;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
-	public boolean checkRun(String rateLimiterKey, TimeUnit timeUnit, int permits) {
+	public boolean check(String rateLimiterKey, TimeUnit timeUnit, int permits) {
 		CheckTask task = new CheckTask(rateLimiterKey, timeUnit, permits);
 		Future<Boolean> checkResult = executorService.submit(task);
-		boolean retVal = true;
+		boolean retVal = false;
 		try {
-			//TODO checkActionTimeout
-			retVal = checkResult.get(100, TimeUnit.MILLISECONDS);
+			retVal = checkResult.get(checkActionTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 			applicationContext.publishEvent(new RateCheckFailureEvent(e, "Access rate check task executed failed."));
-		} 
+			log.error(e.getMessage(), e);
+		}
 		return retVal;
 	}
 
-	class CheckTask implements Callable<Boolean> {
+	private class CheckTask implements Callable<Boolean> {
 		private String rateLimiterKey;
 		private TimeUnit timeUnit;
 		private int permits;
@@ -59,7 +62,7 @@ public final class RateChecker implements ApplicationContextAware {
 			this.permits = permits;
 		}
 
-		public Boolean call() throws InterruptedException, ExecutionException {
+		public Boolean call() {
 			IRateLimiter redisRatelimiter = rateLimiterFactory.get(timeUnit);
 			return redisRatelimiter.acquire(rateLimiterKey, permits);
 		}

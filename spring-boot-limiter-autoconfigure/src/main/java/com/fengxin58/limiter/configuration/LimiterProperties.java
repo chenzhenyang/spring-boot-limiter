@@ -15,7 +15,7 @@ public final class LimiterProperties {
     /**
      * check action execution timeout(MILLISECONDS)
      */
-    private int checkActionTimeout = 100;
+    private int checkActionTimeout = 50000;
 
     /**
      * the flag to tell whether rate limiter configuration can change dynamically
