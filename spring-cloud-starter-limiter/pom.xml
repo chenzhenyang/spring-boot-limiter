@@ -8,11 +8,11 @@
 	<packaging>jar</packaging>
 
 	<name>spring-cloud-starter-limiter</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Cloud Starter Limiter</description>
 
 	<parent>
 		<groupId>com.fengxin58</groupId>
-		<artifactId>limiter</artifactId>
+		<artifactId>spring-boot-limiter</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 

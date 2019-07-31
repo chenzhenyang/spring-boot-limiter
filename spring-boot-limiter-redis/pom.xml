@@ -8,11 +8,11 @@
 	<packaging>jar</packaging>
 
 	<name>spring-boot-limiter-redis</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Boot Limiter Redis</description>
 
 	<parent>
 		<groupId>com.fengxin58</groupId>
-		<artifactId>limiter</artifactId>
+		<artifactId>spring-boot-limiter</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
