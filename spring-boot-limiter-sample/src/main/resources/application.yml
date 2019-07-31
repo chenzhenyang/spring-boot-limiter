@@ -6,5 +6,10 @@ spring:
     name: demo1
   redis: 
     host: 127.0.0.1
+security: 
+  oauth2:
+    resource:
+      jwk:
+        key-set-uri: https://stage-uaa.ddforme.com/uaa/token_keys            
 
 
