@@ -1,7 +1,8 @@
 package com.fengxin58.limiter.configuration;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 @ConfigurationProperties(prefix = "spring.limiter")
 @Data
