@@ -23,9 +23,9 @@ public class AuthenticationPopulator implements IStandardEvaluationContextPopula
 		if(authentication instanceof OAuth2Authentication) {
 			Object principal = authentication.getPrincipal();
 			String clientId = ((OAuth2Authentication)authentication).getOAuth2Request().getClientId();
-			map.put("principal", principal.toString());
-			map.put("client", clientId);
-			context.setVariable("AccessToken", map);
+			map.put("user_name", principal.toString());
+			map.put("client_id", clientId);
+			context.setVariable("JwtClaims", map);
 		}
 		
 		//TODO other type Authentication
