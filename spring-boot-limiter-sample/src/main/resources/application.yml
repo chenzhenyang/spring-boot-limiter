@@ -10,6 +10,4 @@ security:
   oauth2:
     resource:
       jwk:
-        key-set-uri: https://stage-uaa.ddforme.com/uaa/token_keys            
-
-
+        key-set-uri: https://stage-uaa.ddforme.com/uaa/token_keys
